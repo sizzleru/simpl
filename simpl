@@ -1,0 +1,109 @@
+#!/usr/bin/python
+
+from __future__ import annotations
+
+# Standard Library
+import argparse
+import sys
+from pathlib import Path
+from typing import List
+from importlib import import_module
+from os.path import basename, dirname
+from typing import Tuple, Callable, Any
+
+# Custom Library
+from lark import Lark, Transformer, v_args
+from lark.lexer import Token
+from typeguard import typechecked as strict
+
+# Personal Library
+
+parser = argparse.ArgumentParser(
+        prog="simpl",
+        description="Compiler for SiMPL",
+        epilog="by sizzleru"
+)
+
+parser.add_argument("-f", "--file")
+#parser.add_argument("-v", "--verbose")
+
+def load_module(module_path: Path) -> None:
+    if not module_path.is_file():
+        raise FileNotFoundError
+
+    #name = module_name.split(".")[3]
+    module_name = (dirname(module_path) + '/' + module_path.stem).replace("/",".")
+    return import_module(module_name).Module
+
+    #print(module)
+    #print(module.Printable)
+    #print(module.Printable.__bases__)
+
+    #print(dir(import_module((dirname(module_path) + '/' + module_path.stem).replace("/","."))))
+    #print(import_module((dirname(module_path) + '/' + module_path.stem).replace("/",".")).__builtins__)
+
+
+@v_args(inline=True)
+#@strict
+class SiMPLTransformer(Transformer):
+    def module(self: SiMPLTransformer, token: Token) -> Token:
+        module_name = Path(token)
+        return_token = token.update(value=module_name)
+        modules[module_name] = load_module(return_token.value)
+        return return_token
+
+    def command(self: SiMPLTransformer, token: Token) -> Token:
+        return token
+
+    def line(self: SiMPLTransformer, *tokens: Token) -> Token | Tuple:
+        token, rest = tokens if len(tokens) == 2 else tokens[0], None
+        return token
+
+import_parser = Lark(r"""
+line   : command "\n" line?
+command: "import " module
+       | number
+number : /[0-9]+/
+module : /([A-Za-z0-9]|_|\/|\.)+/
+    """, start="line" #, parser="lalr", transformer=SiMPLTransformer()
+)
+
+if __name__ == "__main__":
+    if (input_file := parser.parse_args().file) != "":
+        file = open(input_file, "r")
+        file_content = file.read()
+
+        modules = {}
+
+        tree = import_parser.parse(file_content)
+        #print(tree.pretty())
+        result = SiMPLTransformer().transform(tree)
+        grammars = []
+
+        test = "line:command\"\\n\"line?\n"
+        #print(test)
+
+        for module_name, module in modules.items():
+            #print(str(module_name).split('/')[3], dir(module))
+            #print(module.token_name(), module.grammarize())
+            grammars = module.grammarize(grammars)
+
+        for grammar in grammars:
+            a,b = grammar
+            test += a.token_name() + ":" + b.token() + "\n"
+
+        #print(test)
+        test_parser = Lark(test, start="line")
+        test_tree = test_parser.parse("import shizuru/best/girl\n")
+        print(test_tree.pretty())
+        #print(SiMPLTransformer().transform(
+
+
+
+
+
+
+
+    else:
+        raise NotI#mplementedError
+
