@@ -9,7 +9,7 @@ from typing import Optional
 from typeguard import typechecked as strict
 
 # Personal imports
-from module.default.system.grammar.base.v0_0_1 import Grammar
+from source.grammar import Grammar
 
 @strict
 class Module(Grammar):
@@ -20,7 +20,7 @@ class Module(Grammar):
     def terminal(self: Module) -> bool:
         return False
 
-    def token(self: Module) -> str:
+    def token_name(self: Module) -> str:
         return 'command'
 
     def token_from(self: Module) -> str:

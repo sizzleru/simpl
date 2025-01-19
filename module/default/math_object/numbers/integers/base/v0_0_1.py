@@ -21,6 +21,12 @@ class Module(Printable):
         return True
 
     def token(self: Module) -> str:
+        return Printable().token_terminal() + self.token_name()
+
+    def token_name(self: Module) -> str:
+        return 'number'
+
+    def token_terminal(self: Module) -> str:
         return '/[1-9]+[0-9]*/'
 
     def str(self: Module) -> str:

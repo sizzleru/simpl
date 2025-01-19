@@ -18,6 +18,7 @@ from lark.tree import Tree
 from typeguard import typechecked as strict
 
 # Personal Library
+from source.grammar import Grammar
 
 arg_parser = argparse.ArgumentParser(
         prog="simpl",
@@ -28,30 +29,53 @@ arg_parser = argparse.ArgumentParser(
 arg_parser.add_argument("-f", "--file")
 #parser.add_argument("-v", "--verbose")
 
-def load_module(module_path: Path) -> None:
+@strict
+def load_module(module_path: Path) -> Grammar:
     if not module_path.is_file():
         raise FileNotFoundError
 
     module_name = (dirname(module_path) + '/' + module_path.stem).replace("/",".")
     return (import_module(module_name).Module)()
 
+@strict
+def load_modules(terminal_module_path: Path) -> List[Grammar]:
+    module = load_module(terminal_module_path)
+    modules = []
+    if not module.terminal():
+        raise NotImplementedError # For now can't import non-terminal modules (later can do it but will need a check to verify its closed off)
+    while not module.root():
+        modules.append(module)
+        module = module._parent()
+
+    return modules
 
 @v_args(inline=True)
 @strict
 class SiMPLTransformer(Transformer):
-    def load(self: Transformer, token: Token):
-        modules.append(load_module(Path(token)))
-        return None
 
-    def printable(self: Transformer, token: Token):
-        print(str(token))
-        #return int(token)
+    def __init__(self: SiMPLTransformer, modules: List[Grammar] = []) -> None:
+        self._modules = modules
+
+    def module(self: Transformer, token: Token):
+        self._modules += load_modules(Path(token))
+
+    def number(self: Transformer, token: Token):
+        print(token)
+
+    #def load(self: Transformer, token: Token):
+        #self._modules += load_modules(Path(token))
+
+    #def printable(self: Transformer, token: Token):
+    #    print(token)
+    #    #print(str(token))
 
     #def command(self, tree: Any):
-    #    return None
+    #    print(type(tree))
+    #    pass
 
-    #def line(self, tree: Any):
-    #    return None
+    #def line(self, *tree: Any):
+    #    pass
+    #    #print(tree)
 
 def generate_parser(modules):
     final_grammar = "line:command\"\\n\"line?\n"
@@ -60,11 +84,15 @@ def generate_parser(modules):
     seen_modules = set(['line'])
 
     for module in modules:
+        if module.terminal():
+            final_grammar += module.token_name() + ":" + module.token_terminal() + "\n"
         if not module.token_from() in seen_modules:
             final_grammar += module.token_from() + ":" + module.token() + "\n"
             seen_modules.add(module.token_from())
         else:
             final_grammar += "|" + module.token() + "\n"
+
+    #print(final_grammar)
 
     return Lark(final_grammar, start="line")
 
@@ -72,49 +100,32 @@ def generate_parser(modules):
 if __name__ == "__main__":
 
     # Allow module imports
-    initial_modules = [
-            'module/default/system/module/base/v0_0_1.py',
-            'module/default/system/load/base/v0_0_1.py',
-    ]
-
-    modules = []
-    for initial_module in map(Path, initial_modules):
-        modules.append(load_module(initial_module))
+    initial_module = Path('module/default/system/module/base/v0_0_1.py')
+    modules = load_modules(initial_module)
+    transformer = SiMPLTransformer(modules)
     parser = generate_parser(modules)
 
     if (input_file := arg_parser.parse_args().file) != "":
         file_contents = []
         file_segment = ""
-        chain_load = False
 
         file = open(input_file, "r")
         for line in file:
             if line.split(' ')[0] == 'load':
-                if chain_load:
-                    file_segment += line
-                else:
-                    if file_segment != "":
-                        file_contents.append(file_segment)
-                    chain_load = True
-                    file_segment = line
+                if file_segment != "":
+                    file_contents.append(file_segment)
+                file_segment = ""
+                file_contents.append(line)
             else:
-                if chain_load:
-                    chain_load = False
-                    if file_segment != "":
-                        file_contents.append(file_segment)
-                    file_segment = line
-                else:
-                    file_segment += line
+                file_segment += line
         if file_segment != "":
             file_contents.append(file_segment)
 
         for file_segment in file_contents:
             tree = parser.parse(file_segment)
             #print(tree.pretty())
-            leftover = SiMPLTransformer().transform(tree)
+            leftover = transformer.transform(tree)
             parser = generate_parser(modules)
-
-        #print(leftover)
     else:
         raise NotImplementedError
 

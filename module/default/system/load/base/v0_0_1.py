@@ -21,8 +21,8 @@ class Module(Command):
     def terminal(self: Module) -> bool:
         return False
 
-    def token(self: Module) -> str:
+    def token_name(self: Module) -> str:
         return 'load'
 
-    def load_object(self: Module, token: str) -> str:
-        return '"load' + self._delimiter + '"' + token
+    def token_terminal(self: Module) -> str:
+        return '"load' + self._delimiter + '"'

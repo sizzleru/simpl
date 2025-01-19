@@ -21,8 +21,11 @@ class Module(Command):
     def terminal(self: Module) -> bool:
         return False
 
-    def token(self: Module) -> str:
+    def token_name(self: Module) -> str:
         return 'printable'
+
+    def token_terminal(self: Module) -> str:
+        return ''
 
     #@abstractmethod
     def str(self: Module) -> str:

@@ -21,4 +21,10 @@ class Module(Load):
         return True
 
     def token(self: Module) -> str:
-        return self.load_object('/([A-Za-z0-9]|_|\\/|\\.)+/')
+        return Load().token_terminal() + self.token_name()
+
+    def token_name(self: Module) -> str:
+        return 'module'
+
+    def token_terminal(Self: Module) -> str:
+        return '/([A-Za-z0-9]|_|\\/|\\.)+/'

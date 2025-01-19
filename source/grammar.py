@@ -38,8 +38,16 @@ class Grammar(ABC):
 
     @abstractmethod
     def token(self: Grammar) -> str:
+        return self.token_name()
+
+    @abstractmethod
+    def token_name(self: Grammar) -> str:
         return "line"
 
     @abstractmethod
     def token_from(self: Grammar) -> str:
+        pass
+
+    #@abstractmethod # Move this and terminal method into a terminal class
+    def token_terminal(self: Grammar) -> str:
         pass
