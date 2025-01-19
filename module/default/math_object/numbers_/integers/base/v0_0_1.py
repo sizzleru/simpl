@@ -11,18 +11,19 @@ from typeguard import typechecked as strict
 # Personal imports
 from module.default.system.command.base.v0_0_1 import Module as Command
 from module.default.system.grammar.base.v0_0_1 import Grammar, GrammarRule
+from module.default.system.printable.str.v0_0_1 import Module as Printable
 
 @strict
-class Module(Grammar):
+class Module(Printable):
 
     def root() -> bool:
         return False
 
-    def token():
-        return '/([A-Za-z0-9]|_|\\/|\\.)+/'
+    def token() -> str:
+        return '/[1-9][0-9]*/'
 
     def token_name() -> str:
-        return 'module_name'
+        return 'integers'
 
     def grammarize(grammars = []):
-        return grammars + [(Module, Module)]
+        return grammars + [(Printable, Module)]

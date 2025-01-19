@@ -10,32 +10,36 @@ from typeguard import typechecked as strict
 
 # Personal imports
 
-class GrammarRule:
-
-    def __init__(self: GrammarRule, LHS: str, RHS: str):
-        self._LHS = LHS
-        self._RHS = RHS
-
-    def __str__(self: GrammarRule) -> str:
-        return self._LHS + " -> " + self._RHS
-
 @strict
 class Grammar(ABC):
 
-    delimiter = ' '
+    _instantiated = set()
+    _instance = None
 
-    #@abstractmethod
-    def token() -> str:
+    def __new__(cls):
+        cls._parent = cls.__bases__[0]
+
+        if not cls in cls._instantiated:
+            cls._instantiated.add(cls)
+            cls._instance = super(Grammar, cls).__new__(cls)
+
+        return cls._instance
+
+    def __init__(self: Grammar, delimiter: str = ' ') -> None:
+        self._delimiter = delimiter
+
+    @abstractmethod
+    def root(self: Grammar) -> bool:
         pass
 
     @abstractmethod
-    def token_name() -> str:
+    def terminal(self: Grammar) -> bool:
         pass
 
     @abstractmethod
-    def root() -> bool:
-        return False
+    def token(self: Grammar) -> str:
+        return "line"
 
     @abstractmethod
-    def grammarize(grammars = []):
+    def token_from(self: Grammar) -> str:
         pass

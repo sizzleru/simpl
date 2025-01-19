@@ -22,8 +22,7 @@ class Module(Command):
         return False
 
     def token(self: Module) -> str:
-        return 'printable'
+        return 'load'
 
-    #@abstractmethod
-    def str(self: Module) -> str:
-        return NotImplementedError
+    def load_object(self: Module, token: str) -> str:
+        return '"load' + self._delimiter + '"' + token

@@ -9,19 +9,19 @@ from typing import Optional
 from typeguard import typechecked as strict
 
 # Personal imports
-from module.default.system.grammar.base.v0_0_1 import Grammar, GrammarRule
+from module.default.system.grammar.base.v0_0_1 import Grammar
 
-#@strict
+@strict
 class Module(Grammar):
 
-    def __init__(self, arg):
-        print(arg)
-
-    def root() -> bool:
+    def root(self: Module) -> bool:
         return True
 
-    def token_name() -> str:
+    def terminal(self: Module) -> bool:
+        return False
+
+    def token(self: Module) -> str:
         return 'command'
 
-    def tokenize() -> Optional[GrammarRule]:
-        return Module.token_name()
+    def token_from(self: Module) -> str:
+        return self._parent().token()
