@@ -18,29 +18,21 @@ from typeguard import typechecked as strict
 
 # Personal Library
 
-parser = argparse.ArgumentParser(
+arg_parser = argparse.ArgumentParser(
         prog="simpl",
         description="Compiler for SiMPL",
         epilog="by sizzleru"
 )
 
-parser.add_argument("-f", "--file")
+arg_parser.add_argument("-f", "--file")
 #parser.add_argument("-v", "--verbose")
 
 def load_module(module_path: Path) -> None:
     if not module_path.is_file():
         raise FileNotFoundError
 
-    #name = module_name.split(".")[3]
     module_name = (dirname(module_path) + '/' + module_path.stem).replace("/",".")
     return import_module(module_name).Module
-
-    #print(module)
-    #print(module.Printable)
-    #print(module.Printable.__bases__)
-
-    #print(dir(import_module((dirname(module_path) + '/' + module_path.stem).replace("/","."))))
-    #print(import_module((dirname(module_path) + '/' + module_path.stem).replace("/",".")).__builtins__)
 
 
 @v_args(inline=True)
@@ -59,51 +51,50 @@ class SiMPLTransformer(Transformer):
         token, rest = tokens if len(tokens) == 2 else tokens[0], None
         return token
 
-import_parser = Lark(r"""
-line   : command "\n" line?
-command: "import " module
-       | number
-number : /[0-9]+/
-module : /([A-Za-z0-9]|_|\/|\.)+/
-    """, start="line" #, parser="lalr", transformer=SiMPLTransformer()
-)
+def generate_parser(modules):
+    final_grammar = "line:command\"\\n\"line?\n"
+    grammars = []
+
+    for module_name, module in modules.items():
+        grammars = module.grammarize(grammars)
+
+    grammars.sort(key=lambda grammar: grammar[0].token_name())
+    terminal_defined = set()
+
+    for grammar in grammars:
+        terminal, rule = grammar
+        if terminal.token_name() in terminal_defined:
+            final_grammar += "|" + rule.token() + "\n"
+        else:
+            terminal_defined.add(terminal.token_name())
+            final_grammar += terminal.token_name() + ":" + rule.token() + "\n"
+
+    print(final_grammar)
+
+    return Lark(final_grammar, start="line")
+
 
 if __name__ == "__main__":
-    if (input_file := parser.parse_args().file) != "":
+
+    # Allow module imports
+    initial_modules = [
+            'module/default/system/module_name/base/v0_0_1.py',
+            'module/default/system/import/base/v0_0_1.py',
+            'module/default/system/printable/str/v0_0_1.py',
+            'module/default/math_object/numbers/integers/base/v0_0_1.py'
+    ]
+
+    modules = {}
+    for initial_module in map(Path, initial_modules):
+        modules[initial_module] = load_module(initial_module)
+    parser = generate_parser(modules)
+
+    if (input_file := arg_parser.parse_args().file) != "":
         file = open(input_file, "r")
         file_content = file.read()
 
-        modules = {}
-
-        tree = import_parser.parse(file_content)
-        #print(tree.pretty())
-        result = SiMPLTransformer().transform(tree)
-        grammars = []
-
-        test = "line:command\"\\n\"line?\n"
-        #print(test)
-
-        for module_name, module in modules.items():
-            #print(str(module_name).split('/')[3], dir(module))
-            #print(module.token_name(), module.grammarize())
-            grammars = module.grammarize(grammars)
-
-        for grammar in grammars:
-            a,b = grammar
-            test += a.token_name() + ":" + b.token() + "\n"
-
-        #print(test)
-        test_parser = Lark(test, start="line")
-        test_tree = test_parser.parse("import shizuru/best/girl\n")
-        print(test_tree.pretty())
-        #print(SiMPLTransformer().transform(
-
-
-
-
-
-
-
+        result = parser.parse(file_content)
+        print(result.pretty())
     else:
-        raise NotI#mplementedError
+        raise NotImplementedError
 
