@@ -9,10 +9,10 @@ from typing import Optional
 from typeguard import typechecked as strict
 
 # Personal imports
-from source.grammar import Grammar
+from source.cfg import CFG
 
 @strict
-class Module(Grammar):
+class Module(CFG):
 
     def root(self: Module) -> bool:
         return True

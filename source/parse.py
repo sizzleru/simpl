@@ -20,16 +20,53 @@ from typeguard import typechecked as strict
 # Personal Library
 from source.cfg import CFG
 from source.module import load_module, load_modules
-from source.parse import generate_parser, SiMPLTransformer
 
-arg_parser = argparse.ArgumentParser(
-        prog="simpl",
-        description="Compiler for SiMPL",
-        epilog="by sizzleru"
-)
+@strict
+def generate_parser(modules):
+    final_CFG = "line:command\"\\n\"line?\n"
 
-arg_parser.add_argument("-f", "--file")
-#parser.add_argument("-v", "--verbose")
+    modules.sort(key=lambda module: module.token_from())
+    seen_modules = set(['line'])
+
+    for module in modules:
+        if module.terminal():
+            final_CFG += module.token_name() + ":" + module.token_terminal() + "\n"
+        if not module.token_from() in seen_modules:
+            final_CFG += module.token_from() + ":" + module.token() + "\n"
+            seen_modules.add(module.token_from())
+        else:
+            final_CFG += "|" + module.token() + "\n"
+
+    #print(final_CFG)
+
+    return Lark(final_CFG, start="line")
+
+@v_args(inline=True)
+@strict
+class SiMPLTransformer(Transformer):
+
+    def __init__(self: SiMPLTransformer, modules: List[CFG] = []) -> None:
+        self._modules = modules
+
+    def module(self: Transformer, token: Token):
+        self._modules += load_modules(Path(token))
+
+    def integer(self: Transformer, token: Token):
+        print(token)
+    #def load(self: Transformer, token: Token):
+        #self._modules += load_modules(Path(token))
+
+    #def printable(self: Transformer, token: Token):
+    #    print(token)
+    #    #print(str(token))
+
+    #def command(self, tree: Any):
+    #    print(type(tree))
+    #    pass
+
+    #def line(self, *tree: Any):
+    #    pass
+    #    #print(tree)
 
 if __name__ == "__main__":
 
