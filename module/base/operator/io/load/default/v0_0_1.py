@@ -10,7 +10,7 @@ from typing import Optional
 from typeguard import typechecked as strict
 
 # Personal imports
-from module.default.system.command.base.v0_0_1 import Module as Command
+from module.base.grammar.command.default.v0_0_1 import Module as Command
 
 @strict
 class Module(Command):
@@ -22,11 +22,7 @@ class Module(Command):
         return False
 
     def token_name(self: Module) -> str:
-        return 'printable'
+        return 'load'
 
     def token_terminal(self: Module) -> str:
-        return ''
-
-    #@abstractmethod
-    def str(self: Module) -> str:
-        return NotImplementedError
+        return '"load' + self._delimiter + '"'

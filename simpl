@@ -19,7 +19,7 @@ from typeguard import typechecked as strict
 
 # Personal Library
 from source.cfg import CFG
-from source.module import load_module, load_modules
+from source.module import load_module, load_modules, ModulePath
 from source.parse import generate_parser, SiMPLTransformer
 
 arg_parser = argparse.ArgumentParser(
@@ -34,7 +34,7 @@ arg_parser.add_argument("-f", "--file")
 if __name__ == "__main__":
 
     # Allow module imports
-    initial_module = Path('module/default/system/module/base/v0_0_1.py')
+    initial_module = ModulePath('object/system/module')
     modules = load_modules(initial_module)
     transformer = SiMPLTransformer(modules)
     parser = generate_parser(modules)

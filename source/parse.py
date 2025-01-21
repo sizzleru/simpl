@@ -19,7 +19,8 @@ from typeguard import typechecked as strict
 
 # Personal Library
 from source.cfg import CFG
-from source.module import load_module, load_modules
+from source.module import load_module, load_modules, ModulePath
+
 
 @strict
 def generate_parser(modules):
@@ -49,7 +50,7 @@ class SiMPLTransformer(Transformer):
         self._modules = modules
 
     def module(self: Transformer, token: Token):
-        self._modules += load_modules(Path(token))
+        self._modules += load_modules(ModulePath(token))
 
     def integer(self: Transformer, token: Token):
         print(token)
@@ -67,36 +68,4 @@ class SiMPLTransformer(Transformer):
     #def line(self, *tree: Any):
     #    pass
     #    #print(tree)
-
-if __name__ == "__main__":
-
-    # Allow module imports
-    initial_module = Path('module/default/system/module/base/v0_0_1.py')
-    modules = load_modules(initial_module)
-    transformer = SiMPLTransformer(modules)
-    parser = generate_parser(modules)
-
-    if (input_file := arg_parser.parse_args().file) != "":
-        file_contents = []
-        file_segment = ""
-
-        file = open(input_file, "r")
-        for line in file:
-            if line.split(' ')[0] == 'load':
-                if file_segment != "":
-                    file_contents.append(file_segment)
-                file_segment = ""
-                file_contents.append(line)
-            else:
-                file_segment += line
-        if file_segment != "":
-            file_contents.append(file_segment)
-
-        for file_segment in file_contents:
-            tree = parser.parse(file_segment)
-            #print(tree.pretty())
-            leftover = transformer.transform(tree)
-            parser = generate_parser(modules)
-    else:
-        raise NotImplementedError
 
