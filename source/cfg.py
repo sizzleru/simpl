@@ -7,6 +7,7 @@ from typing import Any, Optional
 
 # Custom imports
 from typeguard import typechecked as strict
+from lark.lexer import Token
 
 # Personal imports
 
@@ -61,7 +62,7 @@ class CFG(ABC):
 
     # Parse the token from the Abstract Syntax Tree
     @abstractmethod
-    def parse(self: CFG, *arg: str) -> CFG:
+    def parse(self: CFG, *args: Token) -> Token:
         pass
 
     # For debugging and printing purposes
