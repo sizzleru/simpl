@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#'!/usr/bin/python
 
 from __future__ import annotations
 
@@ -24,19 +24,20 @@ from source.module import load_module, load_modules, ModulePath
 
 @strict
 def generate_parser(modules):
-    final_CFG = "line:command\"\\n\"line?\n"
 
-    modules.sort(key=lambda module: module.token_from())
-    seen_modules = set(['line'])
+    final_CFG = ""
+    modules.sort(key=lambda module: module._parent().name)
+    seen_modules = set()
 
     for module in modules:
-        if module.terminal():
-            final_CFG += module.token_name() + ":" + module.token_terminal() + "\n"
-        if not module.token_from() in seen_modules:
-            final_CFG += module.token_from() + ":" + module.token() + "\n"
-            seen_modules.add(module.token_from())
+        if module.token:
+            final_CFG += module.name + ":/" + module.token + "/\n"
+
+        if module._parent().name in seen_modules:
+            final_CFG += "|" + module.rule_parent(module) + "\n"
         else:
-            final_CFG += "|" + module.token() + "\n"
+            final_CFG += module._parent().name + ":" + module.rule_parent(module) + "\n"
+            seen_modules.add(module._parent().name)
 
     #print(final_CFG)
 
@@ -52,7 +53,7 @@ class SiMPLTransformer(Transformer):
     def module(self: Transformer, token: Token):
         self._modules += load_modules(ModulePath(token))
 
-    def integer(self: Transformer, token: Token):
+    def natural(self: Transformer, token: Token):
         print(token)
     #def load(self: Transformer, token: Token):
         #self._modules += load_modules(Path(token))

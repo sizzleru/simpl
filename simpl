@@ -35,7 +35,10 @@ if __name__ == "__main__":
 
     # Allow module imports
     initial_module = ModulePath('object/system/module')
+
+    # Global dynamic modules (generates grammar)
     modules = load_modules(initial_module)
+
     transformer = SiMPLTransformer(modules)
     parser = generate_parser(modules)
 

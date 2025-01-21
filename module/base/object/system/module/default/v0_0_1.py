@@ -14,17 +14,19 @@ from module.base.operator.io.load.default.v0_0_1 import Module as Load
 @strict
 class Module(Load):
 
-    def root(self: Module) -> bool:
-        return False
 
-    def terminal(self: Module) -> bool:
-        return True
 
-    def token(self: Module) -> str:
-        return Load().token_terminal() + self.token_name()
+    #def root(self: Module) -> bool:
+    #    return False
 
-    def token_name(self: Module) -> str:
-        return 'module'
+    #def terminal(self: Module) -> bool:
+    #    return True
 
-    def token_terminal(Self: Module) -> str:
-        return '/([A-Za-z0-9]|_|\\/|\\.)+/'
+    #def token(self: Module) -> str:
+    #    return Load().token_terminal() + self.token_name()
+
+    #def token_name(self: Module) -> str:
+    #    return 'module'
+
+    #def token_terminal(Self: Module) -> str:
+    #    return '/([A-Za-z0-9]|_|\\/|\\.)+/'

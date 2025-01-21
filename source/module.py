@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Standard Library
 from pathlib import Path
-from typing import List
+from typing import List, Any
 from importlib import import_module
 from os.path import basename, dirname
 from typing import Tuple, Callable, Any, TYPE_CHECKING
@@ -30,9 +30,11 @@ def load_module(module_path: ModulePath) -> CFG:
 def load_modules(terminal_module_path: ModulePath) -> List[CFG]:
     module = load_module(terminal_module_path)
     modules = []
-    if not module.terminal():
+
+    if not module.token:
         raise NotImplementedError # For now can't import non-terminal modules (later can do it but will need a check to verify its closed off)
-    while not module.root():
+
+    while not module._parent is CFG:
         modules.append(module)
         module = module._parent()
 

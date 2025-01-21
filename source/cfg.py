@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 # Builtin imports
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 from typing import Any, Optional
 
 # Custom imports
@@ -16,6 +16,8 @@ class CFG(ABC):
     _instantiated = set()
     _instance = None
 
+    # This shit show is to essentially produce singleton classes
+    # of which subclasses also become singleton
     def __new__(cls):
         cls._parent = cls.__bases__[0]
 
@@ -28,26 +30,40 @@ class CFG(ABC):
     def __init__(self: CFG, delimiter: str = ' ') -> None:
         self._delimiter = delimiter
 
+    # The name of the class (specifically used as the grammar)
+    # This should be referenced in rule instead of hardcoding where possible
+    @property
     @abstractmethod
-    def root(self: CFG) -> bool:
+    def name(self: CFG) -> str:
         pass
 
+    # Gives the token to accept as this property type (regex)
+    # None if doesn't get parsed as a value
+    @property
     @abstractmethod
-    def terminal(self: CFG) -> bool:
+    def token(self: CFG) -> Optional[str]:
         pass
 
+    # Gives the form to parse from parent classes
+    # Will also be used by child classes to form grammars
+    # Returns none if it has a token attribute
     @abstractmethod
-    def token(self: CFG) -> str:
-        return self.token_name()
-
-    @abstractmethod
-    def token_name(self: CFG) -> str:
-        return "line"
-
-    @abstractmethod
-    def token_from(self: CFG) -> str:
+    def rule(self: CFG, *args: CFG) -> Optional[str]:
         pass
 
-    #@abstractmethod # Move this and terminal method into a terminal class
-    def token_terminal(self: CFG) -> str:
+    # Inherited function, should provide the rule form
+    # of the parent class
+    def rule_parent(self: CFG, *args: CFG) -> Optional[str]:
+        if self._parent is CFG:
+            raise ValueError("rule_parent can not be used for root module")
+        else:
+            return self._parent().rule(*args)
+
+    # Parse the token from the Abstract Syntax Tree
+    @abstractmethod
+    def parse(self: CFG, *arg: str) -> CFG:
         pass
+
+    # For debugging and printing purposes
+    def __str__(self: CFG) -> str:
+        return f'Grammar <name: {str(self.name)}, token: {str(self.token)}>'
