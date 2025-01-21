@@ -11,7 +11,7 @@ from typeguard import typechecked as strict
 # Personal imports
 
 @strict
-class Grammar(ABC):
+class CFG(ABC):
 
     _instantiated = set()
     _instance = None
@@ -21,33 +21,33 @@ class Grammar(ABC):
 
         if not cls in cls._instantiated:
             cls._instantiated.add(cls)
-            cls._instance = super(Grammar, cls).__new__(cls)
+            cls._instance = super(CFG, cls).__new__(cls)
 
         return cls._instance
 
-    def __init__(self: Grammar, delimiter: str = ' ') -> None:
+    def __init__(self: CFG, delimiter: str = ' ') -> None:
         self._delimiter = delimiter
 
     @abstractmethod
-    def root(self: Grammar) -> bool:
+    def root(self: CFG) -> bool:
         pass
 
     @abstractmethod
-    def terminal(self: Grammar) -> bool:
+    def terminal(self: CFG) -> bool:
         pass
 
     @abstractmethod
-    def token(self: Grammar) -> str:
+    def token(self: CFG) -> str:
         return self.token_name()
 
     @abstractmethod
-    def token_name(self: Grammar) -> str:
+    def token_name(self: CFG) -> str:
         return "line"
 
     @abstractmethod
-    def token_from(self: Grammar) -> str:
+    def token_from(self: CFG) -> str:
         pass
 
     #@abstractmethod # Move this and terminal method into a terminal class
-    def token_terminal(self: Grammar) -> str:
+    def token_terminal(self: CFG) -> str:
         pass

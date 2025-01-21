@@ -9,10 +9,10 @@ from typing import Optional
 from typeguard import typechecked as strict
 
 # Personal imports
-from module.default.system.printable.str.v0_0_1 import Module as Printable
+from module.base.operator.io.print.str.v0_0_1 import Module as Print
 
 @strict
-class Module(Printable):
+class Module(Print):
 
     def root(self: Module) -> bool:
         return False
@@ -21,10 +21,10 @@ class Module(Printable):
         return True
 
     def token(self: Module) -> str:
-        return Printable().token_terminal() + self.token_name()
+        return self._parent().token_terminal() + self.token_name()
 
     def token_name(self: Module) -> str:
-        return 'number'
+        return 'integer'
 
     def token_terminal(self: Module) -> str:
         return '/[1-9]+[0-9]*/'

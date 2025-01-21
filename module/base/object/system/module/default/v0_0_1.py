@@ -9,7 +9,7 @@ from typing import Optional
 from typeguard import typechecked as strict
 
 # Personal imports
-from module.default.system.load.base.v0_0_1 import Module as Load
+from module.base.operator.io.load.default.v0_0_1 import Module as Load
 
 @strict
 class Module(Load):
