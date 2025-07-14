@@ -4,6 +4,7 @@ from __future__ import annotations
 # Builtin imports
 from abc import ABC, abstractmethod, abstractproperty
 from typing import Any, Optional
+from sys import exit
 
 # Custom imports
 from typeguard import typechecked as strict

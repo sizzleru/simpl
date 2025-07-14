@@ -9,6 +9,7 @@ from typing import Optional
 # Custom imports
 from typeguard import typechecked as strict
 from lark.lexer import Token
+from sys import exit
 
 # Personal imports
 from module.base.grammar.command.default.latest import Module as Command
@@ -32,5 +33,9 @@ class Module(Command):
     def rule(self: CFG, object: CFG) -> Optional[str]:
         return '"' + self.name + self._delimiter + '"' + object.name
 
-    def parse(self: CFG, arg: Token) -> Token:
-        return arg.update(value=0, type=int) # Should return an exit status (class)
+    #def parse(self: CFG, arg: Token) -> Token:
+    #    return arg.update(value=0, type=int) # Should return an exit status (class)
+
+    # needs to be changed to token type
+    def parse(self: CFG, arg) -> Token:
+        return Token(value=arg, type=list)
