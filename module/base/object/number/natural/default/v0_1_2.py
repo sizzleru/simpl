@@ -6,6 +6,7 @@ from typing import Optional
 
 # Custom imports
 from typeguard import typechecked as strict
+from lark.lexer import Token
 
 # Personal imports
 from module.base.operator.io.print.default.latest import Module as Print
@@ -25,5 +26,5 @@ class Module(Print):
     def rule(self: CFG, *args: CFG) -> Optional[str]:
         return None
 
-    def parse(self: CFG, value: str) -> CFG:
-        return int(value)
+    def parse(self: CFG, arg: Token) -> Token:
+        return arg.update(value=int(arg), type=int)

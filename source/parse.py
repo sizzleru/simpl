@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Standard Library
 import argparse
-import sys
+from sys import exit
 from pathlib import Path
 from typing import List
 from importlib import import_module
@@ -40,6 +40,7 @@ def generate_parser(modules):
             seen_modules.add(module._parent().name)
 
     #print(final_CFG)
+    #exit(0)
 
     return Lark(final_CFG, start="line")
 
@@ -53,8 +54,33 @@ class SiMPLTransformer(Transformer):
     def module(self: Transformer, token: Token):
         self._modules += load_modules(ModulePath(token))
 
-    def natural(self: Transformer, token: Token):
-        print(token)
+        # Probably need to move to load_modules
+        for module in self._modules:
+            self.__dict__[module.name]=module.parse
+
+        #print((self.__dict__['natural'](Token(int,3))).value._value)
+        #sys.exit(0)
+        #print(self.__dict__)
+
+
+        #self.__dict__['test']=lambda x: print('Hello' + str(x))
+        #print(self.__dict__)
+        #for module in self._modules:
+        #    #print(Token(int,3))
+
+        #    try:
+        #        pass
+        #        print(module.parse(Token(int,3)))
+        #        #print(module)
+        #        #print(module.parse)
+        #        #print(type(module.transform(Token(str,3))))
+        #    except:
+        #        pass
+        #sys.exit(0)
+
+    #def natural(self: Transformer, token: Token):
+    #    Natural
+
     #def load(self: Transformer, token: Token):
         #self._modules += load_modules(Path(token))
 

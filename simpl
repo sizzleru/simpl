@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Standard Library
 import argparse
-import sys
+from sys import exit
 from pathlib import Path
 from typing import List
 from importlib import import_module
@@ -41,6 +41,8 @@ if __name__ == "__main__":
 
     transformer = SiMPLTransformer(modules)
     parser = generate_parser(modules)
+    #print(dir(transformer))
+    #sys.exit(0)
 
     if (input_file := arg_parser.parse_args().file) != "":
         file_contents = []
@@ -58,10 +60,20 @@ if __name__ == "__main__":
         if file_segment != "":
             file_contents.append(file_segment)
 
+        #print(file_contents)
+        #sys.exit(0)
         for file_segment in file_contents:
             tree = parser.parse(file_segment)
             #print(tree.pretty())
+            #print(dir(transformer))
+            #if 'test' in dir(transformer):
+            #    print(transformer.test(Token('int', 3)))
+            #    print(transformer.test)
+            #    print(transformer.natural(Token(int,3)))
+            #    pass
+            #sys.exit(0)
             leftover = transformer.transform(tree)
+            #print(leftover.pretty())
             parser = generate_parser(modules)
     else:
         raise NotImplementedError
