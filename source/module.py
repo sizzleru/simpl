@@ -23,7 +23,11 @@ if TYPE_CHECKING:
 
 @strict
 def load_module(module_path: ModulePath) -> CFG:
-    module_name = (dirname(module_path.path()) + '/' + module_path.path().stem).replace("/",".")
+    #module_name = (dirname(module_path.path()) + '/' + module_path.path().stem).replace("/",".")
+    module_name = ".".join((
+        *(module_path.path().parts[:-1]),
+        module_path.path().stem
+    ))
     return (import_module(module_name).Module)()
 
 @strict
